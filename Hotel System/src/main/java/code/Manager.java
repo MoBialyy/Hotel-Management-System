@@ -2,9 +2,10 @@ package main.java.code;
 
 public class Manager extends Employee {
 
-    public Manager(String name, int age, double salary, String jobTitle,
-                   String birthPlace, String email, String phoneNumber, String address) {
-        super(name, age, salary, jobTitle, birthPlace, email, phoneNumber, address);
+    public Manager(String firstName, String lastName, int age, double salary, String jobTitle,
+                   String birthPlace, String email, String phoneNumber, String address, 
+                   String password) {
+        super(firstName, lastName, age, salary, jobTitle, birthPlace, email, phoneNumber, address, password);
     }
 
     @Override

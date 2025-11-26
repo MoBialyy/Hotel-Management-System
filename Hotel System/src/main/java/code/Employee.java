@@ -3,7 +3,8 @@ package main.java.code;
 public abstract class Employee {
     private static int idCounter = 1; // static counter shared by all employees
     private int id;
-    private String name;
+    private String firstName;
+    private String lastName;
     private int age;
     private double salary;
     private String jobTitle;
@@ -11,11 +12,14 @@ public abstract class Employee {
     private String email;
     private String phoneNumber;
     private String address;
+    private String password;
 
-    public Employee(String name, int age, double salary, String jobTitle,
-                    String birthPlace, String email, String phoneNumber, String address) {
+    public Employee(String firstName, String lastName, int age, double salary, String jobTitle,
+                    String birthPlace, String email, String phoneNumber, String address, 
+                    String password) {
         this.id = idCounter++; // assign and then increment
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.age = age;
         this.salary = salary;
         this.jobTitle = jobTitle;
@@ -23,22 +27,30 @@ public abstract class Employee {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.password = password;
     }
 
     // Shared method
     public void displayInfo() {
-        System.out.println("ID: " + id + ", Name: " + name + ", Age: " + age +
+        System.out.println("ID: " + id + ", First Name: " + firstName + 
+                ", Last Name: " + lastName + ", Age: " + age +
                 ", Salary: " + salary + ", Job Title: " + jobTitle +
                 ", Birth Place: " + birthPlace + ", Email: " + email +
-                ", Phone: " + phoneNumber + ", Address: " + address);
+                ", Phone: " + phoneNumber + ", Address: " + address + ", Password: " + password);
     }
 
     // Getters
     public int getId() {
         return id;
     }
+    public String getFirstName() {
+        return firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
     public String getName() {
-        return name;
+        return firstName + " " + lastName;
     }
     public int getAge() {
         return age;
@@ -61,10 +73,20 @@ public abstract class Employee {
     public String getAddress() {
         return address;
     }
+    public String getPassword() {
+        return password;
+    }
 
     // Setters
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public void setName(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
     public void setAge(int age) {
         this.age = age;
@@ -86,6 +108,9 @@ public abstract class Employee {
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     // Abstract method to force child classes to implement specific duties
