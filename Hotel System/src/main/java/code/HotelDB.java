@@ -9,18 +9,20 @@ public class HotelDB {
     // Singleton instance
     private static HotelDB instance;
 
-    private List<Employee> employees;         // All employees (managers + receptionists)
     private List<Manager> managers;           // Only managers
     private List<Receptionist> receptionists; // Only receptionists
+    private List<Worker> workers;             // Only workers
+    private List<Employee> employees;         // All employees (managers + receptionists)
     private List<Resident> residents;         // All residents
     private List<Room> rooms;                 // All rooms in the hotel
-    private List<Booking> bookings; // Global booking list
+    private List<Booking> bookings;           // Global booking list
 
     // Private constructor
-    private HotelDB() {
+    public HotelDB() {
         employees = new ArrayList<>();
         managers = new ArrayList<>();
         receptionists = new ArrayList<>();
+        workers = new ArrayList<>();
         residents = new ArrayList<>();
         rooms = new ArrayList<>();
         bookings = new ArrayList<>();
@@ -49,6 +51,10 @@ public class HotelDB {
         return receptionists;
     }
 
+    public List<Worker> getWorkers() {
+        return workers;
+    }
+
     public List<Resident> getResidents() {
         return residents;
     }
@@ -71,6 +77,11 @@ public class HotelDB {
     public void addReceptionist(Receptionist receptionist) {
         receptionists.add(receptionist);
         employees.add(receptionist);
+    }
+
+    public void addWorker(Worker worker) {
+        workers.add(worker);
+        employees.add(worker);
     }
 
     // -------------------------
@@ -113,6 +124,16 @@ public class HotelDB {
             }
         }
         return available;
+    }
+
+    // Find employee by username
+    public Employee findEmployeeByEmail(String email) {
+        for (Employee emp : employees) {
+            if (emp.getEmail().equals(email)) {
+                return emp;
+            }
+        }
+        return null; // not found
     }
 
     // Find room by number

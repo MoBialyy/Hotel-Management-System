@@ -31,6 +31,15 @@ public class HotelManagement {
         System.out.println("Receptionist created: " + firstName + " " + lastName);
     }
 
+    public void createWorker(String firstName, String lastName, int age, double salary, String jobTitle,
+                             String birthPlace, String email, String phone, String address,
+                             String password) {
+        Worker w = new Worker(firstName, lastName, age, salary, jobTitle, birthPlace, email, phone, address,
+            password);
+        db.addWorker(w);
+        System.out.println("Worker created: " + firstName + " " + lastName);
+    }
+
     // -------------------------
     // RESIDENT METHODS
     // -------------------------
