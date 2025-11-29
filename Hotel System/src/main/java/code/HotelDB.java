@@ -18,7 +18,7 @@ public class HotelDB {
     private List<Booking> bookings;           // Global booking list
 
     // Private constructor
-    public HotelDB() {
+    private HotelDB() {
         employees = new ArrayList<>();
         managers = new ArrayList<>();
         receptionists = new ArrayList<>();
@@ -26,12 +26,18 @@ public class HotelDB {
         residents = new ArrayList<>();
         rooms = new ArrayList<>();
         bookings = new ArrayList<>();
+        
     }
 
     // Lazy initialization
     public static HotelDB getInstance() {
         if (instance == null) {
             instance = new HotelDB();
+            RoomFactory.createRooms(5, 5, 5); // Initial rooms
+            instance.addManager(new Manager("John", "Doe", 55, 50000, "Manager", "Cairo", "manager@hotel.com", "01020304050", "12 downtown cairo", "manager123"));
+            instance.addReceptionist(new Receptionist("Jane", "Smith", 30, 30000, "Receptionist", "Alexandria", "receptionist@hotel.com", "01020304051", "34 seaside ave", "receptionist123"));
+            instance.addWorker(new Worker("Mike", "Johnson", 28, 25000, "Housekeeping", "Giza", "worker@hotel.com", "01020304052", "56 pyramid st", "worker123"));
+            instance.addResident(new Resident("Alice", "Brown", 32, "American", "alice@gmail.com", "01020304053", "78 elm st", "A1234567"));
         }
         return instance;
     }
@@ -82,6 +88,11 @@ public class HotelDB {
     public void addWorker(Worker worker) {
         workers.add(worker);
         employees.add(worker);
+    }
+
+    public void deleteWorker(Worker worker) {
+        workers.remove(worker);
+        employees.remove(worker);
     }
 
     // -------------------------
@@ -141,6 +152,16 @@ public class HotelDB {
         for (Room room : rooms) {
             if (room.getRoomNumber() == number) {
                 return room;
+            }
+        }
+        return null; // not found
+    }
+
+    // Find resident by ID
+    public Resident getResidentById(int id) {
+        for (Resident res : residents) {
+            if (res.getId() == id) {
+                return res;
             }
         }
         return null; // not found

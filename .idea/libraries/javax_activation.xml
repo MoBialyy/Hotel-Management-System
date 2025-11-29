@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="javax.activation">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Hotel System/lib/javax.activation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Hotel System/lib/javax.mail.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

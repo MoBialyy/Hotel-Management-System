@@ -1,7 +1,10 @@
 package main.java.gui;
 
 import main.java.code.HotelDB;
+import main.java.code.EmailSender;
 import main.java.code.Employee;
+import javax.mail.MessagingException;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +18,7 @@ public class LoginPanel extends JPanel {
         setBackground(new Color(240,240,240));
 
         // ---------------------------
-        // Top Banner (same as WelcomePanel)
+        // Top Banner
         // ---------------------------
         ImageIcon bannerIcon = new ImageIcon(getClass().getResource("/assets/hotel_banner.jpg"));
         Image scaledImg = bannerIcon.getImage().getScaledInstance(200, 100, Image.SCALE_SMOOTH);
@@ -50,7 +53,7 @@ public class LoginPanel extends JPanel {
         formPanel.add(passwordField, gbc);
 
         // ---------------------------
-        // Login Button (smaller, gray, simple hover)
+        // Login Button
         // ---------------------------
         JButton loginButton = new JButton("Login") {
             @Override
@@ -66,7 +69,6 @@ public class LoginPanel extends JPanel {
         loginButton.setPreferredSize(new Dimension(160, 40)); // smaller size
         loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Simple hover effect
         loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 loginButton.setBackground(new Color(120, 120, 120));
@@ -89,6 +91,119 @@ public class LoginPanel extends JPanel {
         add(formPanel, BorderLayout.CENTER);
 
         // ---------------------------
+        // Forgot Password Button
+        // ---------------------------
+        JButton forgotBtn = new JButton("Forgot Password?");
+        forgotBtn.setBorderPainted(false);
+        forgotBtn.setContentAreaFilled(false);
+        forgotBtn.setFocusPainted(false);
+        forgotBtn.setForeground(new Color(30, 100, 200)); // link-like blue
+        forgotBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        forgotBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        // hover effect
+        forgotBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                forgotBtn.setForeground(new Color(20, 80, 180));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                forgotBtn.setForeground(new Color(30, 100, 200));
+            }
+        });
+
+        // add it under the login button
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(0, 0, 15, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(forgotBtn, gbc);
+
+        // action on click
+        forgotBtn.addActionListener(e -> {
+            // Ask for employee email
+            String email = JOptionPane.showInputDialog(
+                    this,
+                    "Enter your registered email:",
+                    "Reset Password",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (email == null || email.isBlank()) {
+                return; // user canceled
+            }
+
+            // Check if employee exists
+            Employee emp = hotelDB.findEmployeeByEmail(email);
+            if (emp == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No employee found with this email.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // Generate 6-digit code
+            String code = String.valueOf((int)(Math.random() * 900000) + 100000);
+
+            try {
+                // Send code via Gmail
+                EmailSender.sendCode(email, code);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Failed to send email:\n" + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // Ask user to enter verification code
+            String userCode = JOptionPane.showInputDialog(
+                    this,
+                    "A verification code was sent to your email.\nEnter the code:",
+                    "Verify Code",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (userCode == null) return;
+
+            if (!userCode.equals(code)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Incorrect code.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // Let user set new password
+            String newPass = JOptionPane.showInputDialog(
+                    this,
+                    "Enter your new password:",
+                    "Reset Password",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (newPass == null || newPass.isBlank()) return;
+
+            emp.setPassword(newPass);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Password reset successfully.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+
+
+
+        // ---------------------------
         // Login Action
         // ---------------------------
         loginButton.addActionListener(e -> {
@@ -97,12 +212,10 @@ public class LoginPanel extends JPanel {
 
             Employee emp = hotelDB.findEmployeeByEmail(email);
 
+            // Hardcoded admin credentials
             if (email.equalsIgnoreCase("admin@hotel.com") && password.equals("admin123")) {
                 frame.setContentPane(new AdminPanel(frame));}
-            else if (email.equalsIgnoreCase("manager@hotel.com") && password.equals("admin123")) {
-                frame.setContentPane(new ManagerPanel(frame));}
-            else if (email.equalsIgnoreCase("recep@hotel.com") && password.equals("admin123")) {
-                frame.setContentPane(new ReceptionistPanel(frame));}
+            // Check employee credentials
             else if (emp != null && emp.getPassword().equals(password)) {
                 switch (emp.getJobTitle().toLowerCase()) {
                     case "admin" -> frame.setContentPane(new AdminPanel(frame));

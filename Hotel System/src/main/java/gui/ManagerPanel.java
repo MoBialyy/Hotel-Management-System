@@ -36,12 +36,12 @@ public class ManagerPanel extends JPanel {
         JButton manageEmpsBtn = new JButton("Manage Employees"); // add/edit/delete employees
         JButton viewEmpsBtn = new JButton("View Employees");     // all workers/receptionists
         JButton manageResidentsBtn = new JButton("Manage Residents"); // add/edit/delete residents
-        JButton viewResidentsBtn = new JButton("View Residents"); // add/edit/delete residents
-        JButton manageRoomsBtn = new JButton("Manage Rooms");       // create room/rooms
-        JButton viewRoomssBtn = new JButton("View Rooms");          // all rooms
+        JButton viewResidentsBtn = new JButton("View Residents"); // view residents
+        JButton trackRoomsBtn = new JButton("Track Income");       // income from rooms
+        JButton viewRoomssBtn = new JButton(" --");          // --
 
         // Style all buttons consistently
-        JButton[] buttons = {manageEmpsBtn, viewEmpsBtn, manageResidentsBtn, viewResidentsBtn, manageRoomsBtn, viewRoomssBtn};
+        JButton[] buttons = {manageEmpsBtn, viewEmpsBtn, manageResidentsBtn, viewResidentsBtn, trackRoomsBtn, viewRoomssBtn};
         for (JButton btn : buttons) {
             btn.setFont(new Font("SansSerif", Font.BOLD, 16));
             btn.setBackground(new Color(95, 95, 95));
@@ -86,7 +86,7 @@ public class ManagerPanel extends JPanel {
         // Third row
         gbc.gridx = 0;
         gbc.gridy = 2;
-        buttonPanel.add(manageRoomsBtn, gbc);
+        buttonPanel.add(trackRoomsBtn, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -99,33 +99,38 @@ public class ManagerPanel extends JPanel {
         // Action Listeners (example)
         // ---------------------------
         manageEmpsBtn.addActionListener(e -> {
-            // TODO: Open panel/dialog to Add/Edit/Delete employees
-            JOptionPane.showMessageDialog(this, "Open Manage emps Panel");
+            frame.setContentPane(new WorkerManagementPanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
 
         viewEmpsBtn.addActionListener(e -> {
-            // TODO: Open panel/dialog to create rooms using RoomFactory
-            JOptionPane.showMessageDialog(this, "Open view emp Panel");
+            frame.setContentPane(new ViewWorkersPanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
 
         manageResidentsBtn.addActionListener(e -> {
-            // TODO: Display list of all employees
-            JOptionPane.showMessageDialog(this, "Open manage res Panel");
+            frame.setContentPane(new ViewResidentsPanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
 
         viewResidentsBtn.addActionListener(e -> {
-            // TODO: Display list of all residents
-            JOptionPane.showMessageDialog(this, "Open View Residents Panel");
+            frame.setContentPane(new ViewResidentsPanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
 
-        manageRoomsBtn.addActionListener(e -> {
+        trackRoomsBtn.addActionListener(e -> {
             // TODO: Open panel/dialog to Add/Edit/Delete residents
             JOptionPane.showMessageDialog(this, "Open Manage rooms Panel");
         });
 
-        viewRoomssBtn.addActionListener(e -> {
-            // TODO: Open panel/dialog to Add/Edit/Delete residents
-            JOptionPane.showMessageDialog(this, "Open view rooms Panel");
+        viewRoomssBtn.addActionListener(e -> {        
+            frame.setContentPane(new ViewRoomsPanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
     }
 }
