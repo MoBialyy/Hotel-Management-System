@@ -8,6 +8,7 @@ public class HotelDB {
 
     // Singleton instance
     private static HotelDB instance;
+    private static HotelManagement hotelManagement; // Facade for hotel operations
 
     private List<Manager> managers;           // Only managers
     private List<Receptionist> receptionists; // Only receptionists
@@ -16,7 +17,7 @@ public class HotelDB {
     private List<Resident> residents;         // All residents
     private List<Room> rooms;                 // All rooms in the hotel
     private List<Booking> bookings;           // Global booking list
-
+    
     // Private constructor
     private HotelDB() {
         employees = new ArrayList<>();
@@ -36,8 +37,16 @@ public class HotelDB {
             RoomFactory.createRooms(5, 5, 5); // Initial rooms
             instance.addManager(new Manager("John", "Doe", 55, 50000, "Manager", "Cairo", "manager@hotel.com", "01020304050", "12 downtown cairo", "manager123"));
             instance.addReceptionist(new Receptionist("Jane", "Smith", 30, 30000, "Receptionist", "Alexandria", "receptionist@hotel.com", "01020304051", "34 seaside ave", "receptionist123"));
-            instance.addWorker(new Worker("Mike", "Johnson", 28, 25000, "Housekeeping", "Giza", "worker@hotel.com", "01020304052", "56 pyramid st", "worker123"));
-            instance.addResident(new Resident("Alice", "Brown", 32, "American", "alice@gmail.com", "01020304053", "78 elm st", "A1234567"));
+            instance.addWorker(new Worker("Mike", "Johnson", 28, 25000, "Housekeeping", "Giza", "mike@worker.com", "01020304052", "56 pyramid st", "worker123"));
+            instance.addWorker(new Worker("Sara", "Davis", 26, 24000, "Maintenance", "Luxor", "sara@worker.com" , "01020934054", "90 nile rd", "worker124"));
+            instance.addWorker(new Worker("Alex", "Scott", 35, 22000, "Cleaner", "Cairo", "alex@worker.com", "01021204055", "98 nile st", "worker125"));
+            instance.addResident(new Resident("Alice", "Brown", 32, "American", "alice@gmail.com", "01020304053", "78 elm st", "1234567"));
+            instance.addResident(new Resident("Bob", "Wilson", 45, "British", "bob@gmail.com", "01020304056", "90 oak st", "7654321"));
+            instance.addResident(new Resident("Charlie", "Miller", 29, "Canadian", "charlie@gmail.com", "01020304057", "12 maple st", "1122334"));
+            Resident r1 = new Resident("Ali", "Hassan", 28, "Egyptian", "ali@gmail.com", "0123456789", "Cairo", "20202919210192");
+            instance.addResident(r1);
+            instance.hotelManagement = new HotelManagement();
+            hotelManagement.bookRoomByType(r1, "Single", LocalDate.now().plusDays(0), 3, BoardingOption.BED_AND_BREAKFAST);
         }
         return instance;
     }
@@ -100,6 +109,10 @@ public class HotelDB {
     // -------------------------
     public void addResident(Resident resident) {
         residents.add(resident);
+    }
+
+    public void deleteResident(Resident resident) {
+        residents.remove(resident);
     }
 
     // -------------------------
@@ -167,4 +180,15 @@ public class HotelDB {
         return null; // not found
     }
 
+    // Get currently available rooms (today)
+    public List<Room> getAvailableRoomsCurrently() {
+        LocalDate today = LocalDate.now();
+        List<Room> available = new ArrayList<>();
+        for (Room room : rooms) {
+            if (room.isAvailable(today, today.plusDays(1))) {
+                available.add(room);
+            }
+        }
+        return available;
+    }
 }

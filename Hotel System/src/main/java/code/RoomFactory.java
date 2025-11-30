@@ -33,4 +33,8 @@ public class RoomFactory {
         for (int i = 0; i < numTriples; i++)
             createRoom("Triple");
     }
+
+    public static void setLastRoomNumber(int lastNumber) {
+        lastRoomNumber = lastNumber;
+    }
 }

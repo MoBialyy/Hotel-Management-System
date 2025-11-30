@@ -61,6 +61,7 @@ public class HotelManagement {
             if (room.getType().equalsIgnoreCase(type) && room.isAvailable(checkIn, checkOut)) {
                 Booking booking = new Booking(resident, room, checkIn, nights, boardingOption);
                 db.addBooking(booking); // adds to global DB, resident, and room
+                resident.addBooking(booking);
                 System.out.println("Booking confirmed: " + resident.getName() +
                         " -> Room " + room.getRoomNumber() +
                         ", Type: " + type +
@@ -96,6 +97,54 @@ public class HotelManagement {
                 ", From " + checkIn + " To " + checkOut);
 
         return true;
+    }
+
+    public void checkoutResident(Resident resident) {
+        Booking activeBooking = resident.getActiveBooking(); // get the active booking
+
+        if (activeBooking == null) {
+            System.out.println("No active booking found for " + resident.getName());
+            return;
+        }
+
+        if (activeBooking.isCheckedOut()) {
+            System.out.println(resident.getName() + " has already checked out.");
+            return;
+        }
+
+        // Perform checkout
+        activeBooking.setCheckedOut(true);       // mark booking as checked out
+        resident.setCheckedOut(true);            // optional: mark resident as checked out
+        System.out.println("Checkout completed for " + resident.getName() +
+                ". Total amount due: " + activeBooking.getTotalPrice());
+    }
+
+    public void checkoutRoomResidents(Resident resident) {
+        Booking activeBooking = resident.getActiveBooking();
+        if (activeBooking == null) {
+            System.out.println("No active booking found for " + resident.getName());
+            return;
+        }
+
+        Room room = activeBooking.getRoom();
+        double totalAmount = 0.0;
+        StringBuilder message = new StringBuilder("Checkout completed for:\n");
+
+        for (Booking b : room.getBookings()) {
+            if (!b.isCheckedOut() &&
+                b.overlaps(activeBooking.getCheckInDate(), activeBooking.getCheckOutDate())) {
+                
+                Resident r = b.getResident();
+                b.setCheckedOut(true);
+                r.setCheckedOut(true);  // mark resident as checked out
+
+                totalAmount += b.getTotalPrice();
+                message.append(String.format("%s - $%.2f\n", r.getName(), b.getTotalPrice()));
+            }
+        }
+
+        message.append(String.format("Total Amount Paid: $%.2f", totalAmount));
+        System.out.println(message.toString());
     }
 
 

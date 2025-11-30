@@ -2,7 +2,6 @@ package main.java.gui;
 
 import main.java.code.HotelDB;
 import main.java.code.Room;
-import main.java.code.RoomFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

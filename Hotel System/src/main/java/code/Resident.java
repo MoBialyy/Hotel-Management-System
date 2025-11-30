@@ -35,7 +35,7 @@ public class Resident {
         this.address = address;
         this.governmentId = governmentId;
         this.totalBill = 0.0;
-        this.hasCheckedOut = false;
+        this.hasCheckedOut = true;
         this.bookings = new ArrayList<>();
     }
 
@@ -150,9 +150,12 @@ public class Resident {
 
 
     // Additional Methods
-    public void addBooking(Booking booking) {
-        bookings.add(booking);
+    public void addBooking(Booking b) {
+        if (!bookings.contains(b)) {
+            bookings.add(b);
+        }
     }
+
 
     public Booking getActiveBooking() {
         for (Booking b : bookings) {

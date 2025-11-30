@@ -63,6 +63,10 @@ public abstract class Room {
         bookings.add(booking);
     }
 
+    public void removeBooking(Booking booking) {
+        bookings.remove(booking);
+    }
+
     public boolean isAvailable(LocalDate checkIn, LocalDate checkOut) {
         for (Booking b : bookings) {
             if (!b.isCheckedOut() && b.overlaps(checkIn, checkOut)) return false;

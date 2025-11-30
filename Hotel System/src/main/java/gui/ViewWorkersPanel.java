@@ -41,8 +41,8 @@ public class ViewWorkersPanel extends JPanel {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.5);
 
-        // Table
-        String[] columns = {"ID", "First Name", "Last Name", "Job Title", "Type"};
+        // Table — removed Type column
+        String[] columns = {"ID", "First Name", "Last Name", "Job Title"};
         tableModel = new DefaultTableModel(columns, 0);
         table = new JTable(tableModel);
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -69,26 +69,24 @@ public class ViewWorkersPanel extends JPanel {
     private void loadEmployees() {
         tableModel.setRowCount(0);
 
-        // Load workers
+        // Workers
         List<Worker> workers = db.getWorkers();
         for (Worker w : workers) {
             tableModel.addRow(new Object[]{
                     w.getId(),
                     w.getFirstName(),
                     w.getLastName(),
-                    w.getJobTitle(),
-                    "Worker"
+                    w.getJobTitle()
             });
         }
 
-        // Load receptionists
+        // Receptionists
         List<Receptionist> receptionists = db.getReceptionists();
         for (Receptionist r : receptionists) {
             tableModel.addRow(new Object[]{
                     r.getId(),
                     r.getFirstName(),
                     r.getLastName(),
-                    "Receptionist",
                     "Receptionist"
             });
         }
@@ -100,45 +98,41 @@ public class ViewWorkersPanel extends JPanel {
 
         if (selectedRow >= 0) {
             int modelRow = table.convertRowIndexToModel(selectedRow);
-
             int id = (int) tableModel.getValueAt(modelRow, 0);
-            String type = (String) tableModel.getValueAt(modelRow, 4);
 
-            if (type.equals("Worker")) {
-                Worker w = db.getWorkers()
-                        .stream()
-                        .filter(worker -> worker.getId() == id)
-                        .findFirst()
-                        .orElse(null);
+            // Determine whether ID belongs to Worker or Receptionist
+            Worker worker = db.getWorkers()
+                    .stream()
+                    .filter(w -> w.getId() == id)
+                    .findFirst()
+                    .orElse(null);
 
-                if (w != null) {
-                    detailPanel.add(new JLabel("Full Name: " + w.getFirstName() + " " + w.getLastName()));
-                    detailPanel.add(new JLabel("Age: " + w.getAge()));
-                    detailPanel.add(new JLabel("Salary: $" + w.getSalary()));
-                    detailPanel.add(new JLabel("Job Title: " + w.getJobTitle()));
-                    detailPanel.add(new JLabel("Birth Place: " + w.getBirthPlace()));
-                    detailPanel.add(new JLabel("Email: " + w.getEmail()));
-                    detailPanel.add(new JLabel("Phone: " + w.getPhoneNumber()));
-                    detailPanel.add(new JLabel("Address: " + w.getAddress()));
-                }
+            Receptionist rec = db.getReceptionists()
+                    .stream()
+                    .filter(r -> r.getId() == id)
+                    .findFirst()
+                    .orElse(null);
 
-            } else if (type.equals("Receptionist")) {
-                Receptionist r = db.getReceptionists()
-                        .stream()
-                        .filter(rec -> rec.getId() == id)
-                        .findFirst()
-                        .orElse(null);
+            if (worker != null) {
+                detailPanel.add(new JLabel("Full Name: " + worker.getFirstName() + " " + worker.getLastName()));
+                detailPanel.add(new JLabel("Age: " + worker.getAge()));
+                detailPanel.add(new JLabel("Salary: $" + worker.getSalary()));
+                detailPanel.add(new JLabel("Job Title: " + worker.getJobTitle()));
+                detailPanel.add(new JLabel("Birth Place: " + worker.getBirthPlace()));
+                detailPanel.add(new JLabel("Email: " + worker.getEmail()));
+                detailPanel.add(new JLabel("Phone: " + worker.getPhoneNumber()));
+                detailPanel.add(new JLabel("Address: " + worker.getAddress()));
+            }
 
-                if (r != null) {
-                    detailPanel.add(new JLabel("Full Name: " + r.getFirstName() + " " + r.getLastName()));
-                    detailPanel.add(new JLabel("Age: " + r.getAge()));
-                    detailPanel.add(new JLabel("Salary: $" + r.getSalary()));
-                    detailPanel.add(new JLabel("Job Title: Receptionist"));
-                    detailPanel.add(new JLabel("Birth Place: " + r.getBirthPlace()));
-                    detailPanel.add(new JLabel("Email: " + r.getEmail()));
-                    detailPanel.add(new JLabel("Phone: " + r.getPhoneNumber()));
-                    detailPanel.add(new JLabel("Address: " + r.getAddress()));
-                }
+            if (rec != null) {
+                detailPanel.add(new JLabel("Full Name: " + rec.getFirstName() + " " + rec.getLastName()));
+                detailPanel.add(new JLabel("Age: " + rec.getAge()));
+                detailPanel.add(new JLabel("Salary: $" + rec.getSalary()));
+                detailPanel.add(new JLabel("Job Title: Receptionist"));
+                detailPanel.add(new JLabel("Birth Place: " + rec.getBirthPlace()));
+                detailPanel.add(new JLabel("Email: " + rec.getEmail()));
+                detailPanel.add(new JLabel("Phone: " + rec.getPhoneNumber()));
+                detailPanel.add(new JLabel("Address: " + rec.getAddress()));
             }
         }
 

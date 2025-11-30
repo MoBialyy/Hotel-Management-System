@@ -14,6 +14,7 @@ public class Booking {
     private boolean checkedOut;
     private double totalPrice;
 
+
     public Booking(Resident resident, Room room, LocalDate checkIn, int nights, BoardingOption boarding) {
         this.resident = resident;
         this.room = room;
@@ -22,14 +23,28 @@ public class Booking {
         this.boarding = boarding;
         this.checkOutDate = checkIn.plusDays(nights);
 
+        // Automatically determine checkedOut status based on today's date
+        if (checkOutDate.isBefore(LocalDate.now())) {
+            this.checkedOut = true;   // booking already past
+        } else {
+            this.checkedOut = false;  // booking still active or ongoing
+        }
+
         // automatic price calculation
         this.totalPrice = calculateTotalPrice();
 
+        // link booking to resident and room
         resident.addBooking(this);
         room.addBooking(this);
 
         resident.addToBill(this.totalPrice);
+
+        // If booking is active, mark resident as not checked out
+        if (!this.checkedOut) {
+            resident.setCheckedOut(false);
+        }
     }
+
 
     private double calculateTotalPrice() {
         double roomCost = room.getPrice() * nights;
@@ -40,8 +55,6 @@ public class Booking {
     public double getTotalPrice() {
         return totalPrice;
     }
-
-
 
     // getters
     public Resident getResident() { 
@@ -70,8 +83,12 @@ public class Booking {
     public void setResident(Resident resident) {
         this.resident = resident;
     }
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setRoom(Room newRoom) {
+        if (room != null) {
+            room.removeBooking(this); // remove from old room
+        }
+        room = newRoom;
+        room.addBooking(this); // add to new room
     }
     public void setCheckInDate(LocalDate checkInDate) {
         this.checkInDate = checkInDate;
@@ -96,6 +113,12 @@ public class Booking {
     public boolean overlaps(LocalDate start, LocalDate end) {
         return start.isBefore(checkOutDate) && end.isAfter(checkInDate);
     }
-
     
+    public void updateCheckedOutStatus() {
+        if (checkOutDate.isBefore(LocalDate.now())) {
+            this.checkedOut = true;
+        } else {
+            this.checkedOut = false;
+        }
+    }
 }
