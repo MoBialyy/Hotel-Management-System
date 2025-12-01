@@ -1,5 +1,7 @@
 package main.java.code;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 // Facade for hotel management operations
 public class HotelManagement {
@@ -184,4 +186,15 @@ public class HotelManagement {
         }
     }
 
+
+    public List<Booking> getBookingsBetweenDates(LocalDate startDate, LocalDate endDate) {
+        List<Booking> result = new ArrayList<>();
+        for (Booking b : db.getBookings()) {
+            if ((b.getCheckInDate().isEqual(startDate) || b.getCheckInDate().isAfter(startDate)) &&
+                (b.getCheckInDate().isBefore(endDate) || b.getCheckInDate().isEqual(endDate))) {
+                result.add(b);
+            }
+        }
+        return result;
+    }
 }

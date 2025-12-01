@@ -34,6 +34,7 @@ public class HotelDB {
     public static HotelDB getInstance() {
         if (instance == null) {
             instance = new HotelDB();
+            instance.hotelManagement = new HotelManagement();
             RoomFactory.createRooms(5, 5, 5); // Initial rooms
             instance.addManager(new Manager("John", "Doe", 55, 50000, "Manager", "Cairo", "manager@hotel.com", "01020304050", "12 downtown cairo", "manager123"));
             instance.addReceptionist(new Receptionist("Jane", "Smith", 30, 30000, "Receptionist", "Alexandria", "receptionist@hotel.com", "01020304051", "34 seaside ave", "receptionist123"));
@@ -45,8 +46,13 @@ public class HotelDB {
             instance.addResident(new Resident("Charlie", "Miller", 29, "Canadian", "charlie@gmail.com", "01020304057", "12 maple st", "1122334"));
             Resident r1 = new Resident("Ali", "Hassan", 28, "Egyptian", "ali@gmail.com", "0123456789", "Cairo", "20202919210192");
             instance.addResident(r1);
-            instance.hotelManagement = new HotelManagement();
             hotelManagement.bookRoomByType(r1, "Single", LocalDate.now().plusDays(0), 3, BoardingOption.BED_AND_BREAKFAST);
+            Resident r2 = new Resident("Mona", "Saeed", 34, "Egyptian", "mona@yahoo.com", "0987654321", "Alexandria", "30303919210193");
+            instance.addResident(r2);
+            hotelManagement.bookRoomByType(r2, "Double", LocalDate.of(2025, 10, 5), 5, BoardingOption.FULL_BOARD);
+            Resident r3 = new Resident("Omar", "Khaled", 40, "Egyptian", "okhaled@gmail.com", "0112233445", "Giza", "40404919210194");
+            instance.addResident(r3);
+            hotelManagement.bookRoomByType(r3, "Triple", LocalDate.of(2025, 11, 22), 7, BoardingOption.HALF_BOARD);
         }
         return instance;
     }

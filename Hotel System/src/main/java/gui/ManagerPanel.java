@@ -88,7 +88,9 @@ public class ManagerPanel extends JPanel {
         });
 
         trackIncomeBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Open Track Income Panel");
+            frame.setContentPane(new TrackIncomePanel(frame));
+            frame.revalidate();
+            frame.repaint();
         });
 
         viewResidentsBtn.addActionListener(e -> {
