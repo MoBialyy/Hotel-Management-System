@@ -1,17 +1,14 @@
 package main.java.gui;
-
 import main.java.code.Booking;
-import main.java.code.HotelDB;
 import main.java.code.Resident;
 import main.java.code.Room;
-
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDate;
+import main.java.code.HotelManagement;
 
 public class ResidentManagementPanel extends JPanel {
 
-    private HotelDB db = HotelDB.getInstance();
+    private HotelManagement hotelManagement = new HotelManagement();
 
     private DefaultListModel<Resident> residentListModel;
     private JList<Resident> residentJList;
@@ -39,7 +36,7 @@ public class ResidentManagementPanel extends JPanel {
 
         // ---------------- Resident List ----------------
         residentListModel = new DefaultListModel<>();
-        for (Resident r : db.getResidents()) {
+        for (Resident r : hotelManagement.getResidents()) {
             residentListModel.addElement(r);
         }
 
@@ -69,14 +66,13 @@ public class ResidentManagementPanel extends JPanel {
         deleteBtn.addActionListener(e -> deleteSelectedResident());
 
         JButton extendBtn = new JButton("Extend Stay");
-        styleButton(extendBtn, new Color(34, 139, 34)); // green
+        styleButton(extendBtn, new Color(34, 139, 34)); 
         extendBtn.addActionListener(e -> extendResidentStay());
 
         JButton changeRoomBtn = new JButton("Change Room");
-        styleButton(changeRoomBtn, new Color(75, 0, 130)); // dark purple
+        styleButton(changeRoomBtn, new Color(75, 0, 130)); 
         changeRoomBtn.addActionListener(e -> changeResidentRoom());
 
-        
         buttonsPanel.add(extendBtn);
         buttonsPanel.add(changeRoomBtn);
         buttonsPanel.add(addBtn);
@@ -107,7 +103,7 @@ public class ResidentManagementPanel extends JPanel {
             );
 
             if (confirm == JOptionPane.YES_OPTION) {
-                db.deleteResident(selected);
+                hotelManagement.deleteResident(selected);
                 residentListModel.removeElement(selected);
             }
 
@@ -123,7 +119,7 @@ public class ResidentManagementPanel extends JPanel {
 
         if (dialog.isSaved()) {
             Resident newResident = dialog.getResident();
-            db.addResident(newResident);
+            hotelManagement.addResident(newResident);
             residentListModel.addElement(newResident);
 
             JOptionPane.showMessageDialog(this, "Resident added successfully!");
@@ -143,7 +139,6 @@ public class ResidentManagementPanel extends JPanel {
         dialog.setVisible(true);
 
         if (dialog.isSaved()) {
-
             selected.setFirstName(dialog.getFirstName());
             selected.setLastName(dialog.getLastName());
             selected.setAge(dialog.getAge());
@@ -202,6 +197,7 @@ public class ResidentManagementPanel extends JPanel {
         }
     }
 
+    // ---------------- Extend Resident Stay ----------------
     private void extendResidentStay() {
         Resident selected = residentJList.getSelectedValue();
         if (selected == null || selected.hasCheckedOut()) {
@@ -217,6 +213,7 @@ public class ResidentManagementPanel extends JPanel {
 
         String nightsStr = JOptionPane.showInputDialog(this, "Enter number of nights to add:");
         if (nightsStr == null) return; // cancelled
+        
         int extraNights;
         try {
             extraNights = Integer.parseInt(nightsStr);
@@ -226,22 +223,18 @@ public class ResidentManagementPanel extends JPanel {
             return;
         }
 
-        Room room = activeBooking.getRoom();
-        LocalDate newCheckOut = activeBooking.getCheckOutDate().plusDays(extraNights);
-
-        if (!room.isAvailable(activeBooking.getCheckOutDate(), newCheckOut)) {
+        boolean success = hotelManagement.extendBookingStay(activeBooking, extraNights);
+        
+        if (!success) {
             JOptionPane.showMessageDialog(this, "Room not available for the extended period.");
             return;
         }
-
-        activeBooking.setNights(activeBooking.getNights() + extraNights); 
-        double extraCost = (room.getPrice() + activeBooking.getBoarding().getPricePerNight()) * extraNights;
-        selected.addToBill(extraCost);
 
         residentJList.repaint();
         JOptionPane.showMessageDialog(this, "Stay extended. New checkout date: " + activeBooking.getCheckOutDate());
     }
     
+    // ---------------- Change Resident Room ----------------
     private void changeResidentRoom() {
         Resident selected = residentJList.getSelectedValue();
         if (selected == null || selected.hasCheckedOut()) {
@@ -255,8 +248,7 @@ public class ResidentManagementPanel extends JPanel {
             return;
         }
 
-        // List of available rooms
-        Room[] availableRooms = HotelDB.getInstance().getAvailableRoomsCurrently().stream()
+        Room[] availableRooms = hotelManagement.getAvailableRoomsCurrently().stream()
                 .filter(r -> r.isAvailable(activeBooking.getCheckInDate(), activeBooking.getCheckOutDate()))
                 .toArray(Room[]::new);
 
@@ -265,7 +257,6 @@ public class ResidentManagementPanel extends JPanel {
             return;
         }
 
-        // Create a display array with room number + type
         String[] roomOptions = new String[availableRooms.length];
         for (int i = 0; i < availableRooms.length; i++) {
             roomOptions[i] = "Room " + availableRooms[i].getRoomNumber() + " (" + availableRooms[i].getType() + ")";
@@ -280,9 +271,8 @@ public class ResidentManagementPanel extends JPanel {
                 roomOptions,
                 roomOptions[0]
         );
-        if (selectedRoomStr == null) return; // cancelled
+        if (selectedRoomStr == null) return;
 
-        // Find the selected room object
         Room newRoom = null;
         for (Room r : availableRooms) {
             String display = "Room " + r.getRoomNumber() + " (" + r.getType() + ")";
@@ -294,13 +284,8 @@ public class ResidentManagementPanel extends JPanel {
         if (newRoom == null) return;
 
         Room oldRoom = activeBooking.getRoom();
-        oldRoom.removeBooking(activeBooking);
-        newRoom.addBooking(activeBooking);
-        activeBooking.setRoom(newRoom);
-
-        double oldCost = oldRoom.getPrice() * activeBooking.getNights();
-        double newCost = newRoom.getPrice() * activeBooking.getNights();
-        selected.addToBill(newCost - oldCost);
+        
+        hotelManagement.changeBookingRoom(activeBooking, oldRoom, newRoom);
 
         residentJList.repaint();
         JOptionPane.showMessageDialog(this, "Room changed to: " + newRoom.getRoomNumber() + 

@@ -1,12 +1,8 @@
 package main.java.gui;
-
 import javax.swing.*;
 import java.awt.*;
-import main.java.code.HotelDB;
 
 public class ReceptionistPanel extends JPanel {
-
-    private HotelDB hotelDB = HotelDB.getInstance();
 
     public ReceptionistPanel(JFrame frame) {
 
@@ -38,7 +34,7 @@ public class ReceptionistPanel extends JPanel {
         JButton viewRoomsBtn = new JButton("View Available Rooms");
         JButton currentResidentsBtn = new JButton("Current Residents");
         JButton searchBtn = new JButton("Search booking");
-        JButton addResidentBtn = new JButton("Add Resident"); // new button
+        JButton addResidentBtn = new JButton("Add Resident"); 
 
         // Style all buttons consistently
         JButton[] buttons = {manageResidentsBtn, newBookingBtn, checkoutBtn,
@@ -92,10 +88,10 @@ public class ReceptionistPanel extends JPanel {
         gbc.gridx = 1;
         buttonPanel.add(searchBtn, gbc);
 
-        // Fourth row (new Add Resident button)
+        // Fourth row
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 2; // full row
+        gbc.gridwidth = 2; 
         buttonPanel.add(addResidentBtn, gbc);
 
         add(buttonPanel, BorderLayout.CENTER);

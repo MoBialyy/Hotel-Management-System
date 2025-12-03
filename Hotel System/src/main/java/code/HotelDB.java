@@ -44,15 +44,18 @@ public class HotelDB {
             instance.addResident(new Resident("Alice", "Brown", 32, "American", "alice@gmail.com", "01020304053", "78 elm st", "1234567"));
             instance.addResident(new Resident("Bob", "Wilson", 45, "British", "bob@gmail.com", "01020304056", "90 oak st", "7654321"));
             instance.addResident(new Resident("Charlie", "Miller", 29, "Canadian", "charlie@gmail.com", "01020304057", "12 maple st", "1122334"));
-            Resident r1 = new Resident("Ali", "Hassan", 28, "Egyptian", "ali@gmail.com", "0123456789", "Cairo", "20202919210192");
+            Resident r1 = new Resident("Ali", "Hassan", 28, "Egyptian", "ali@gmail.com", "0123456789", "99 sheraton", "20202919210192");
             instance.addResident(r1);
             hotelManagement.bookRoomByType(r1, "Single", LocalDate.now().plusDays(0), 3, BoardingOption.BED_AND_BREAKFAST);
-            Resident r2 = new Resident("Mona", "Saeed", 34, "Egyptian", "mona@yahoo.com", "0987654321", "Alexandria", "30303919210193");
+            Resident r2 = new Resident("Mona", "Saeed", 34, "Egyptian", "mona@yahoo.com", "0987654321", "14 new nozha", "30303919210193");
             instance.addResident(r2);
             hotelManagement.bookRoomByType(r2, "Double", LocalDate.of(2025, 10, 5), 5, BoardingOption.FULL_BOARD);
-            Resident r3 = new Resident("Omar", "Khaled", 40, "Egyptian", "okhaled@gmail.com", "0112233445", "Giza", "40404919210194");
+            Resident r3 = new Resident("Omar", "Khaled", 40, "Egyptian", "okhaled@gmail.com", "0112233445", "76 korba", "40404919210194");
             instance.addResident(r3);
             hotelManagement.bookRoomByType(r3, "Triple", LocalDate.of(2025, 11, 22), 7, BoardingOption.HALF_BOARD);
+            Resident r4 = new Resident("Jack", "Wood", 55, "American", "jack@gmail.com", "0123456789", "14 new london", "20202919210192");
+            instance.addResident(r4);
+            hotelManagement.bookRoomByType(r4, "Single", LocalDate.of(2025,12,28), 8, BoardingOption.BED_AND_BREAKFAST);
         }
         return instance;
     }
@@ -157,14 +160,16 @@ public class HotelDB {
     }
 
     // Find employee by username
+    /*
     public Employee findEmployeeByEmail(String email) {
         for (Employee emp : employees) {
             if (emp.getEmail().equals(email)) {
                 return emp;
             }
         }
-        return null; // not found
+        return null; // not found 
     }
+    */
 
     // Find room by number
     public Room getRoomByNumber(int number) {

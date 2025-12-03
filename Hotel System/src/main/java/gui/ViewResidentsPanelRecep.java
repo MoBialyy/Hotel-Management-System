@@ -1,8 +1,6 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.Resident;
-
+import main.java.code.HotelManagement;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -10,11 +8,10 @@ import java.util.List;
 
 public class ViewResidentsPanelRecep extends JPanel {
 
-    private HotelDB db = HotelDB.getInstance();
+    private HotelManagement hotelManagement = new HotelManagement();
     private JTable table;
     private DefaultTableModel tableModel;
     private JTextArea detailArea;
-    private JButton checkOutBtn;
 
     public ViewResidentsPanelRecep(JFrame frame) {
         setLayout(new BorderLayout(10, 10));
@@ -25,7 +22,7 @@ public class ViewResidentsPanelRecep extends JPanel {
         JButton backBtn = new JButton("← Back");
         backBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
         backBtn.addActionListener(e -> {
-            frame.setContentPane(new ReceptionistPanel(frame)); // <-- changed here
+            frame.setContentPane(new ReceptionistPanel(frame));
             frame.revalidate();
             frame.repaint();
         });
@@ -53,17 +50,8 @@ public class ViewResidentsPanelRecep extends JPanel {
         detailArea.setEditable(false);
         JScrollPane detailScroll = new JScrollPane(detailArea);
 
-        // ---------------- Buttons Panel ----------------
-        checkOutBtn = new JButton("Check Out");
-        checkOutBtn.setEnabled(false);
-        checkOutBtn.addActionListener(e -> checkOutSelectedResident());
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        buttonPanel.add(checkOutBtn);
-
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(detailScroll, BorderLayout.CENTER);
-        rightPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // ---------------- Split Pane ----------------
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableScroll, rightPanel);
@@ -81,12 +69,10 @@ public class ViewResidentsPanelRecep extends JPanel {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
-                    Resident r = db.getResidents().get(modelRow);
+                    Resident r = hotelManagement.getResidents().get(modelRow);
                     showResidentDetails(r);
-                    checkOutBtn.setEnabled(!r.hasCheckedOut());
                 } else {
                     detailArea.setText("");
-                    checkOutBtn.setEnabled(false);
                 }
             }
         });
@@ -94,7 +80,7 @@ public class ViewResidentsPanelRecep extends JPanel {
 
     private void loadResidents() {
         tableModel.setRowCount(0);
-        List<Resident> residents = db.getResidents();
+        List<Resident> residents = hotelManagement.getResidents();
         for (Resident r : residents) {
             Object[] row = {
                     r.getId(),
@@ -109,63 +95,51 @@ public class ViewResidentsPanelRecep extends JPanel {
 
     private void showResidentDetails(Resident r) {
         StringBuilder sb = new StringBuilder();
-        sb.append("ID: ").append(r.getId()).append("\n");
-        sb.append("Name: ").append(r.getFirstName()).append(" ").append(r.getLastName()).append("\n");
-        sb.append("Age: ").append(r.getAge()).append("\n");
-        sb.append("Nationality: ").append(r.getNationality()).append("\n");
-        sb.append("Email: ").append(r.getEmail()).append("\n");
-        sb.append("Phone: ").append(r.getPhoneNumber()).append("\n");
-        sb.append("Address: ").append(r.getAddress()).append("\n");
+        sb.append("═══════════════════════════════════════════════\n");
+        sb.append("              RESIDENT DETAILS\n");
+        sb.append("═══════════════════════════════════════════════\n\n");
+        
+        sb.append("ID:            ").append(r.getId()).append("\n");
+        sb.append("Name:          ").append(r.getFirstName()).append(" ").append(r.getLastName()).append("\n");
+        sb.append("Age:           ").append(r.getAge()).append("\n");
+        sb.append("Nationality:   ").append(r.getNationality()).append("\n");
+        sb.append("Email:         ").append(r.getEmail()).append("\n");
+        sb.append("Phone:         ").append(r.getPhoneNumber()).append("\n");
+        sb.append("Address:       ").append(r.getAddress()).append("\n");
         sb.append("Government ID: ").append(r.getGovernmentId()).append("\n");
-        sb.append("Total Bill: $").append(r.getTotalBill()).append("\n");
-        sb.append("Checked Out: ").append(r.hasCheckedOut() ? "Yes" : "No").append("\n\n");
+        sb.append("Total Bill:    $").append(String.format("%.2f", r.getTotalBill())).append("\n");
+        sb.append("Status:        ").append(r.hasCheckedOut() ? "Checked Out" : "Active").append("\n");
 
-        System.out.println(r.getBookings().size());
-        for (var b : r.getBookings()) {
+        sb.append("\n═══════════════════════════════════════════════\n");
+        sb.append("                  BOOKINGS\n");
+        sb.append("═══════════════════════════════════════════════\n\n");
+
+        System.out.println(hotelManagement.getBookings(r).size());
+        for (var b : hotelManagement.getBookings(r)) {
             System.out.println(b);
         }
 
-        sb.append("Bookings:\n");
-        if (r.getBookings().isEmpty()) {
-            sb.append("  No bookings.\n");
+        if (hotelManagement.getBookings(r).isEmpty()) {
+            sb.append("No bookings found.\n");
         } else {
-            for (var b : r.getBookings()) {
-                sb.append("  Room ").append(b.getRoom().getRoomNumber())
-                        .append(" (").append(b.getRoom().getType()).append(")\n")
-                        .append("    Check-in: ").append(b.getCheckInDate())
-                        .append(", Check-out: ").append(b.getCheckOutDate())
-                        .append(",\n Nights: ").append(b.getNights())
-                        .append(", Checked Out: ").append(b.isCheckedOut() ? "Yes" : "No")
-                        .append("\n");
+            int bookingNum = 1;
+            for (var b : hotelManagement.getBookings(r)) {
+                sb.append("┌─ Booking #").append(bookingNum++).append(" ─────────────────────────────────\n");
+                sb.append("│\n");
+                sb.append("│ Room:        Room ").append(b.getRoom().getRoomNumber())
+                        .append(" (").append(b.getRoom().getType()).append(")\n");
+                sb.append("│ Check-in:    ").append(b.getCheckInDate()).append("\n");
+                sb.append("│ Check-out:   ").append(b.getCheckOutDate()).append("\n");
+                sb.append("│ Nights:      ").append(b.getNights()).append("\n");
+                sb.append("│ Boarding:    ").append(b.getBoarding()).append("\n");
+                sb.append("│ Price:       $").append(String.format("%.2f", b.getTotalPrice())).append("\n");
+                sb.append("│ Status:      ").append(b.isCheckedOut() ? "Checked Out" : "Active").append("\n");
+                sb.append("│\n");
+                sb.append("└───────────────────────────────────────────────\n\n");
             }
         }
 
         detailArea.setText(sb.toString());
         detailArea.setCaretPosition(0);
-    }
-
-    private void checkOutSelectedResident() {
-        int selectedRow = table.getSelectedRow();
-        if (selectedRow < 0) return;
-
-        int modelRow = table.convertRowIndexToModel(selectedRow);
-        Resident r = db.getResidents().get(modelRow);
-
-        if (r.hasCheckedOut()) {
-            JOptionPane.showMessageDialog(this, "Resident already checked out.");
-            return;
-        }
-
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to check out " + r.getName() + "?",
-                "Confirm Check Out",
-                JOptionPane.YES_NO_OPTION);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            r.setCheckedOut(true);
-            JOptionPane.showMessageDialog(this, r.getName() + " has been checked out.");
-            showResidentDetails(r);
-            checkOutBtn.setEnabled(false);
-        }
     }
 }

@@ -1,16 +1,19 @@
 package main.java.gui;
-
-import main.java.code.*;
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import main.java.code.BoardingOption;
+import main.java.code.Booking;
+import main.java.code.HotelManagement;
+import main.java.code.Resident;
+import main.java.code.Room;
+
 public class NewBookingPanel extends JPanel {
-    private HotelDB db = HotelDB.getInstance();
+    
     private HotelManagement hotelMgmt = new HotelManagement();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
@@ -292,7 +295,7 @@ public class NewBookingPanel extends JPanel {
         existingGuestCombo.removeAllItems();
         existingGuestCombo.addItem("-- Select a Guest --");
         
-        for (Resident resident : db.getResidents()) {
+        for (Resident resident : hotelMgmt.getResidents()) {
             String displayText = String.format("%s (ID: %d, Phone: %s)", 
                 resident.getName(), resident.getId(), resident.getPhoneNumber());
             existingGuestCombo.addItem(displayText);
@@ -302,7 +305,7 @@ public class NewBookingPanel extends JPanel {
     private void loadGuestInfo() {
         if (existingGuestRadio.isSelected() && existingGuestCombo.getSelectedIndex() > 0) {
             int selectedIndex = existingGuestCombo.getSelectedIndex() - 1;
-            Resident resident = db.getResidents().get(selectedIndex);
+            Resident resident = hotelMgmt.getResidents().get(selectedIndex);
             
             firstNameField.setText(resident.getFirstName());
             lastNameField.setText(resident.getLastName());
@@ -368,7 +371,7 @@ public class NewBookingPanel extends JPanel {
             int nights = Integer.parseInt(nightsField.getText().trim());
             LocalDate checkOut = checkIn.plusDays(nights);
             
-            List<Room> availableRooms = db.getAvailableRooms(checkIn, checkOut);
+            List<Room> availableRooms = hotelMgmt.getAvailableRooms(checkIn, checkOut);
             
             availableRoomsArea.setText("");
             availableRoomsArea.append(String.format("Available Rooms from %s to %s:\n\n", 
@@ -442,10 +445,11 @@ public class NewBookingPanel extends JPanel {
             
             if (success) {
                 // Get the last booking created to show the total price
-                Booking lastBooking = resident.getBookings().get(resident.getBookings().size() - 1);
+                Booking lastBooking = hotelMgmt.getBookings(resident).get(hotelMgmt.getBookings(resident).size() - 1);
                 
                 JOptionPane.showMessageDialog(this, 
                     "Booking created successfully!\n\n" +
+                    "Room: " + lastBooking.getRoom().getRoomNumber() + " (" + lastBooking.getRoom().getType() + ")\n" +
                     "Guest: " + resident.getName() + "\n" +
                     "Check-in: " + checkIn.format(formatter) + "\n" +
                     "Nights: " + nights + "\n" +
@@ -490,7 +494,7 @@ public class NewBookingPanel extends JPanel {
                 return null;
             }
             int selectedIndex = existingGuestCombo.getSelectedIndex() - 1;
-            return db.getResidents().get(selectedIndex);
+            return hotelMgmt.getResidents().get(selectedIndex);
         } else {
             // Validate new guest fields
             if (firstNameField.getText().trim().isEmpty() || 
@@ -520,7 +524,7 @@ public class NewBookingPanel extends JPanel {
                     addressField.getText().trim(),
                     govIdField.getText().trim()
                 );
-                db.addResident(newResident);
+                hotelMgmt.addResident(newResident);
                 return newResident;
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, 

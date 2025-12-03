@@ -1,6 +1,4 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.Room;
 import main.java.code.Booking;
 import javax.swing.*;
@@ -10,9 +8,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import main.java.code.HotelManagement;
 
 public class ViewAvailableRoomsPanel extends JPanel {
-    private HotelDB db = HotelDB.getInstance();
+
+    private HotelManagement hotelManagement = new HotelManagement();
     private JTable roomTable;
     private DefaultTableModel roomTableModel;
     private JTable historyTable;
@@ -187,12 +187,12 @@ public class ViewAvailableRoomsPanel extends JPanel {
         
         // Get rooms based on filter settings
         if (showOnlyAvailable && checkIn != null && checkOut != null) {
-            rooms = db.getAvailableRooms(checkIn, checkOut);
+            rooms = hotelManagement.getAvailableRooms(checkIn, checkOut);
         } else if (showOnlyAvailable) {
             // No dates specified but "Available Only" is active
-            rooms = db.getAvailableRoomsCurrently();
+            rooms = hotelManagement.getAvailableRoomsCurrently();
         } else {
-            rooms = db.getRooms();
+            rooms = hotelManagement.getRooms();
         }
 
         // Populate table
@@ -236,14 +236,14 @@ public class ViewAvailableRoomsPanel extends JPanel {
         selectedRoomLabel.setText("Booking History for Room " + roomNumber);
 
         // Get the room and its bookings
-        Room room = db.getRoomByNumber(roomNumber);
+        Room room = hotelManagement.getRoomByNumber(roomNumber);
         if (room == null) {
             historyTableModel.addRow(new Object[]{"Room not found", "-", "-", "-", "-", "-", "-"});
             return;
         }
 
         List<Booking> bookings = room.getBookings();
-
+        System.out.println("Loading booking history for Room " + roomNumber + ", total bookings: " + bookings.size());
         if (bookings == null || bookings.isEmpty()) {
             historyTableModel.addRow(new Object[]{"No booking history", "-", "-", "-", "-", "-", "-"});
             return;

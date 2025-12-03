@@ -42,6 +42,36 @@ public class HotelManagement {
         System.out.println("Worker created: " + firstName + " " + lastName);
     }
 
+    public Employee findEmployeeByEmail(String email) {
+        for (Employee e : db.getEmployees()) {
+            if (e.getEmail().equalsIgnoreCase(email)) {
+                return e;
+            }
+        }
+        return null; // not found
+    }
+
+    public void setEmployeeNewPassword(Employee emp, String newPassword) {
+        emp.setPassword(newPassword);
+        System.out.println("Password updated for employee: " + emp.getName());
+    }
+
+    public List<Worker> getWorkers(){
+        return db.getWorkers();
+    }
+
+    public int getWorkerCount() {
+        return db.getWorkers().size();
+    }
+
+    public void deleteWorker(Worker worker) {
+        db.deleteWorker(worker);
+        System.out.println("Worker deleted: " + worker.getName());
+    }
+
+    public List<Receptionist> getReceptionists(){
+        return db.getReceptionists();
+    }
     // -------------------------
     // RESIDENT METHODS
     // -------------------------
@@ -51,6 +81,28 @@ public class HotelManagement {
         db.addResident(resident);
         System.out.println("Resident added: " + firstName + " " + lastName);
         return resident;
+    }
+
+    public void addResident(Resident resident) {
+        db.addResident(resident);
+        System.out.println("Resident added: " + resident.getName());
+    }
+
+    public List<Resident> getResidents(){
+        return db.getResidents();
+    }
+    
+    public List<Booking> getBookings(Resident resident){
+        return resident.getBookings();
+    }
+
+    public List<Booking> getBookings(){
+        return db.getBookings();
+    }
+
+    public void deleteResident(Resident resident) {
+        db.getResidents().remove(resident);
+        System.out.println("Resident deleted: " + resident.getName());
     }
 
     // -------------------------
@@ -149,6 +201,12 @@ public class HotelManagement {
         System.out.println(message.toString());
     }
 
+    public void addBooking(Booking booking) {
+        db.addBooking(booking);
+        System.out.println("Booking added for resident: " + booking.getResident().getName() +
+                " in Room " + booking.getRoom().getRoomNumber());
+    }
+
 
     // Print all bookings in hotel
     public void printAllBookings() {
@@ -196,5 +254,88 @@ public class HotelManagement {
             }
         }
         return result;
+    }
+
+    public int getTotalBookingsCount(LocalDate startDate, LocalDate endDate) {
+        return getBookingsBetweenDates(startDate, endDate).size();
+    }
+
+    public double getTotalIncomeBetweenDates(LocalDate startDate, LocalDate endDate) {
+        double totalIncome = 0.0;
+        for (Booking b : getBookingsBetweenDates(startDate, endDate)) {
+            totalIncome += b.getTotalPrice();
+        }
+        return totalIncome;
+    }
+
+    public List<Room> getAvailableRoomsCurrently() {
+        return db.getAvailableRoomsCurrently();
+    }
+
+    public void changeBookingRoom(Booking booking, Room oldRoom, Room newRoom) {
+        // Get old total before any changes
+        double oldTotal = booking.getTotalPrice();
+        
+        // Move booking between rooms
+        oldRoom.removeBooking(booking);
+        newRoom.addBooking(booking);
+        booking.updateRoomReference(newRoom);
+        
+        // Recalculate price with new room
+        booking.recalculateTotalPrice();
+        double newTotal = booking.getTotalPrice();
+        
+        // Adjust resident's bill automatically
+        double difference = newTotal - oldTotal;
+        booking.getResident().addToBill(difference);
+        
+        System.out.println("Booking moved from Room " + oldRoom.getRoomNumber() + 
+                        " to Room " + newRoom.getRoomNumber() + 
+                        " for resident: " + booking.getResident().getName() +
+                        " | Price difference: $" + String.format("%.2f", difference));
+    }
+
+    public boolean extendBookingStay(Booking booking, int extraNights) {
+        Room room = booking.getRoom();
+        LocalDate newCheckOut = booking.getCheckOutDate().plusDays(extraNights);
+        
+        // Check if room is available for extended period
+        if (!room.isAvailable(booking.getCheckOutDate(), newCheckOut)) {
+            return false; // Room not available
+        }
+        
+        // Get old total before extension
+        double oldTotal = booking.getTotalPrice();
+        
+        // Extend the booking
+        booking.extendStay(extraNights);
+        
+        // Calculate new total and adjust bill
+        double newTotal = booking.getTotalPrice();
+        double extraCost = newTotal - oldTotal;
+        booking.getResident().addToBill(extraCost);
+        
+        System.out.println("Booking extended by " + extraNights + " nights for resident: " + 
+                        booking.getResident().getName() + 
+                        " | Extra cost: $" + String.format("%.2f", extraCost) +
+                        " | New checkout: " + booking.getCheckOutDate());
+        
+        return true; 
+    }
+
+    public List<Room> getAvailableRooms(LocalDate checkIn, LocalDate checkOut) {
+        return db.getAvailableRooms(checkIn, checkOut);
+    }
+
+    public List<Room> getRooms() {
+        return db.getRooms();
+    }
+
+    public Room getRoomByNumber(int number) {
+        return db.getRoomByNumber(number);
+    }
+
+    public Resident getResidentById(int id) {
+        return db.getResidentById(id);
     }
 }

@@ -1,9 +1,5 @@
 package main.java.gui;
-
-import main.java.code.Manager;
-import main.java.code.Receptionist;
-import main.java.code.HotelDB;
-
+import main.java.code.HotelManagement;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,8 +7,7 @@ import java.util.regex.Pattern;
 
 public class AdminPanel extends JPanel {
 
-    private HotelDB hotelDB = HotelDB.getInstance();
-
+    private HotelManagement hotelManagement = new HotelManagement();
     public AdminPanel(JFrame frame) {
 
         setLayout(new GridBagLayout());
@@ -194,13 +189,11 @@ public class AdminPanel extends JPanel {
 
                 // ---------------- Create User ----------------
                 if(role.equals("Manager")) {
-                    Manager manager = new Manager(firstName, lastName, age, salary, "Manager",
+                    hotelManagement.createManager(firstName, lastName, age, salary, "Manager",
                             birthPlace, email, phone, address, password);
-                    hotelDB.addManager(manager);
                 } else {
-                    Receptionist receptionist = new Receptionist(firstName, lastName, age, salary, "Receptionist",
+                    hotelManagement.createReceptionist(firstName, lastName, age, salary, "Receptionist",
                             birthPlace, email, phone, address, password);
-                    hotelDB.addReceptionist(receptionist);
                 }
 
                 JOptionPane.showMessageDialog(this, role + " added successfully!");

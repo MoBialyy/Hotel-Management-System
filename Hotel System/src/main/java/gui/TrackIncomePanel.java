@@ -1,12 +1,13 @@
 package main.java.gui;
-
-import main.java.code.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import main.java.code.Booking;
+import main.java.code.HotelManagement;
 
 public class TrackIncomePanel extends JPanel {
     private HotelManagement hotelMgmt = new HotelManagement();
@@ -138,11 +139,15 @@ public class TrackIncomePanel extends JPanel {
                     break;
                 case "This Month":
                     startDate = LocalDate.now().withDayOfMonth(1);
-                    endDate = LocalDate.now();
+                    endDate = YearMonth.now().atEndOfMonth();
                     break;
                 case "This Year":
                     startDate = LocalDate.now().withDayOfYear(1);
-                    endDate = LocalDate.now();
+                    // in case leap years, too much detail :)
+                    if(LocalDate.now().isLeapYear())
+                        endDate = LocalDate.now().withDayOfYear(  366);
+                    else
+                        endDate = LocalDate.now().withDayOfYear(365);
                     break;
                 case "Last Week":
                     LocalDate lastWeekEnd = LocalDate.now().minusDays(LocalDate.now().getDayOfWeek().getValue());
@@ -170,14 +175,13 @@ public class TrackIncomePanel extends JPanel {
 
             // Get bookings in date range
             List<Booking> bookings = hotelMgmt.getBookingsBetweenDates(startDate, endDate);
-            
-            double totalIncome = 0;
-            int bookingCount = 0;
+            // Calculate total income within date range
+            double totalIncome = hotelMgmt.getTotalIncomeBetweenDates(startDate, endDate);
+            // Get total bookings count
+            int bookingCount = hotelMgmt.getTotalBookingsCount(startDate, endDate);
 
+            // this is just to populate the table
             for (Booking b : bookings) {
-                totalIncome += b.getTotalPrice();
-                bookingCount++;
-
                 tableModel.addRow(new Object[]{
                     b.getCheckInDate().format(formatter),
                     b.getResident().getName(),

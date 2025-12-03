@@ -1,16 +1,14 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.Resident;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import main.java.code.HotelManagement;
 
 public class ViewResidentsPanel extends JPanel {
 
-    private HotelDB db = HotelDB.getInstance();
+    private HotelManagement hotelManagement = new HotelManagement();
     private JTable table;
     private DefaultTableModel tableModel;
     private JTextArea detailArea;
@@ -71,7 +69,7 @@ public class ViewResidentsPanel extends JPanel {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
                     int modelRow = table.convertRowIndexToModel(selectedRow);
-                    Resident r = db.getResidents().get(modelRow);
+                    Resident r = hotelManagement.getResidents().get(modelRow);
                     showResidentDetails(r);
                 } else {
                     detailArea.setText("");
@@ -82,7 +80,7 @@ public class ViewResidentsPanel extends JPanel {
 
     private void loadResidents() {
         tableModel.setRowCount(0);
-        List<Resident> residents = db.getResidents();
+        List<Resident> residents = hotelManagement.getResidents();
         for (Resident r : residents) {
             Object[] row = {
                     r.getId(),
@@ -97,30 +95,47 @@ public class ViewResidentsPanel extends JPanel {
 
     private void showResidentDetails(Resident r) {
         StringBuilder sb = new StringBuilder();
-        sb.append("ID: ").append(r.getId()).append("\n");
-        sb.append("Name: ").append(r.getFirstName()).append(" ").append(r.getLastName()).append("\n");
-        sb.append("Age: ").append(r.getAge()).append("\n");
-        sb.append("Nationality: ").append(r.getNationality()).append("\n");
-        sb.append("Email: ").append(r.getEmail()).append("\n");
-        sb.append("Phone: ").append(r.getPhoneNumber()).append("\n");
-        sb.append("Address: ").append(r.getAddress()).append("\n");
+        sb.append("═══════════════════════════════════════════════\n");
+        sb.append("              RESIDENT DETAILS\n");
+        sb.append("═══════════════════════════════════════════════\n\n");
+        
+        sb.append("ID:            ").append(r.getId()).append("\n");
+        sb.append("Name:          ").append(r.getFirstName()).append(" ").append(r.getLastName()).append("\n");
+        sb.append("Age:           ").append(r.getAge()).append("\n");
+        sb.append("Nationality:   ").append(r.getNationality()).append("\n");
+        sb.append("Email:         ").append(r.getEmail()).append("\n");
+        sb.append("Phone:         ").append(r.getPhoneNumber()).append("\n");
+        sb.append("Address:       ").append(r.getAddress()).append("\n");
         sb.append("Government ID: ").append(r.getGovernmentId()).append("\n");
-        sb.append("Total Bill: $").append(r.getTotalBill()).append("\n");
-        sb.append("Checked Out: ").append(r.hasCheckedOut() ? "Yes" : "No").append("\n\n");
+        sb.append("Total Bill:    $").append(String.format("%.2f", r.getTotalBill())).append("\n");
+        sb.append("Status:        ").append(r.hasCheckedOut() ? "Checked Out" : "Active").append("\n");
 
-        sb.append("Bookings:\n");
-        if (r.getBookings().isEmpty()) {
-            sb.append("  No bookings.\n");
+        sb.append("\n═══════════════════════════════════════════════\n");
+        sb.append("                  BOOKINGS\n");
+        sb.append("═══════════════════════════════════════════════\n\n");
+
+        System.out.println(hotelManagement.getBookings(r).size());
+        for (var b : hotelManagement.getBookings(r)) {
+            System.out.println(b);
+        }
+
+        if (hotelManagement.getBookings(r).isEmpty()) {
+            sb.append("No bookings found.\n");
         } else {
-            for (var b : r.getBookings()) {
-                sb.append("  Room ").append(b.getRoom().getRoomNumber())
-                        .append(" (").append(b.getRoom().getType()).append(")\n")
-                        .append("    Check-in: ").append(b.getCheckInDate())
-                        .append(", Check-out: ").append(b.getCheckOutDate())
-                        .append(", Nights: ").append(b.getNights()).append("\n")
-                        .append("    Boarding: ").append(b.getBoarding().name()).append("\n")
-                        .append("    Checked Out: ").append(b.isCheckedOut() ? "Yes" : "No")
-                        .append("\n");
+            int bookingNum = 1;
+            for (var b : hotelManagement.getBookings(r)) {
+                sb.append("┌─ Booking #").append(bookingNum++).append(" ─────────────────────────────────\n");
+                sb.append("│\n");
+                sb.append("│ Room:        Room ").append(b.getRoom().getRoomNumber())
+                        .append(" (").append(b.getRoom().getType()).append(")\n");
+                sb.append("│ Check-in:    ").append(b.getCheckInDate()).append("\n");
+                sb.append("│ Check-out:   ").append(b.getCheckOutDate()).append("\n");
+                sb.append("│ Nights:      ").append(b.getNights()).append("\n");
+                sb.append("│ Boarding:    ").append(b.getBoarding()).append("\n");
+                sb.append("│ Price:       $").append(String.format("%.2f", b.getTotalPrice())).append("\n");
+                sb.append("│ Status:      ").append(b.isCheckedOut() ? "Checked Out" : "Active").append("\n");
+                sb.append("│\n");
+                sb.append("└───────────────────────────────────────────────\n\n");
             }
         }
 

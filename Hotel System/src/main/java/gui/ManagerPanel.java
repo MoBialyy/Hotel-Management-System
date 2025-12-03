@@ -1,5 +1,4 @@
 package main.java.gui;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -27,13 +26,13 @@ public class ManagerPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1;
 
-        // Create only 4 buttons
-        JButton manageEmpsBtn = new JButton("Manage Employees");
+        // Main Buttons
+        JButton manageEmpsBtn = new JButton("Manage Workers");
         JButton viewEmpsBtn   = new JButton("View Employees");
         JButton trackIncomeBtn = new JButton("Track Income");
         JButton viewResidentsBtn = new JButton("View Residents");
 
-        // Style buttons
+        // Styling
         JButton[] buttons = {manageEmpsBtn, viewEmpsBtn, trackIncomeBtn, viewResidentsBtn};
         for (JButton btn : buttons) {
             btn.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -54,7 +53,7 @@ public class ManagerPanel extends JPanel {
         }
 
         // ---------------------------
-        // Add buttons (2 rows × 2 columns)
+        // Add buttons
         // ---------------------------
         gbc.gridwidth = 1;
 

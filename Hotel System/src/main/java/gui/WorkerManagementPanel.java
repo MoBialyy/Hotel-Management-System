@@ -1,15 +1,11 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.Worker;
 import main.java.code.HotelManagement;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class WorkerManagementPanel extends JPanel {
 
-    private HotelDB db = HotelDB.getInstance();
     private HotelManagement hm = new HotelManagement();
 
     private DefaultListModel<Worker> workerListModel;
@@ -38,7 +34,7 @@ public class WorkerManagementPanel extends JPanel {
 
         // ---------------- Worker List ----------------
         workerListModel = new DefaultListModel<>();
-        for (Worker w : db.getWorkers()) {
+        for (Worker w : hm.getWorkers()) {
             workerListModel.addElement(w);
         }
 
@@ -57,7 +53,7 @@ public class WorkerManagementPanel extends JPanel {
         addBtn.addActionListener(e -> openAddWorkerDialog(frame));
 
         JButton editBtn = new JButton("Edit Worker");
-        styleButton(editBtn, new Color(255, 165, 0)); // Orange color
+        styleButton(editBtn, new Color(255, 165, 0)); 
         editBtn.addActionListener(e -> editSelectedWorker(frame));
         
         JButton deleteBtn = new JButton("Delete Worker");
@@ -89,7 +85,7 @@ public class WorkerManagementPanel extends JPanel {
                     "Confirm Delete",
                     JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                db.deleteWorker(selected);
+                hm.deleteWorker(selected);
                 workerListModel.removeElement(selected);
             }
         } else {
@@ -116,7 +112,7 @@ public class WorkerManagementPanel extends JPanel {
                     dialog.getPassword()
             );
 
-            Worker newWorker = db.getWorkers().get(db.getWorkers().size() - 1);
+            Worker newWorker = hm.getWorkers().get(hm.getWorkerCount() - 1);
             workerListModel.addElement(newWorker);
 
             JOptionPane.showMessageDialog(this, "Worker added successfully!");
@@ -131,7 +127,7 @@ public class WorkerManagementPanel extends JPanel {
         return;
     }
 
-    AddWorkerDialog dialog = new AddWorkerDialog(parentFrame, selected); // pass selected worker
+    AddWorkerDialog dialog = new AddWorkerDialog(parentFrame, selected); 
     dialog.setVisible(true);
 
     if (dialog.isSaved()) {

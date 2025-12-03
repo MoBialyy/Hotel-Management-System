@@ -1,17 +1,15 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
-import main.java.code.Worker;
-import main.java.code.Receptionist;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import main.java.code.HotelManagement;
+import main.java.code.Worker;
+import main.java.code.Receptionist;
 
 public class ViewWorkersPanel extends JPanel {
 
-    private HotelDB db = HotelDB.getInstance();
+    private HotelManagement hotelManagement = new HotelManagement();
     private JTable table;
     private DefaultTableModel tableModel;
     private JPanel detailPanel;
@@ -70,7 +68,7 @@ public class ViewWorkersPanel extends JPanel {
         tableModel.setRowCount(0);
 
         // Workers
-        List<Worker> workers = db.getWorkers();
+        List<Worker> workers = hotelManagement.getWorkers();
         for (Worker w : workers) {
             tableModel.addRow(new Object[]{
                     w.getId(),
@@ -81,7 +79,7 @@ public class ViewWorkersPanel extends JPanel {
         }
 
         // Receptionists
-        List<Receptionist> receptionists = db.getReceptionists();
+        List<Receptionist> receptionists = hotelManagement.getReceptionists();
         for (Receptionist r : receptionists) {
             tableModel.addRow(new Object[]{
                     r.getId(),
@@ -101,20 +99,20 @@ public class ViewWorkersPanel extends JPanel {
             int id = (int) tableModel.getValueAt(modelRow, 0);
 
             // Determine whether ID belongs to Worker or Receptionist
-            Worker worker = db.getWorkers()
+            Worker worker = hotelManagement.getWorkers()
                     .stream()
                     .filter(w -> w.getId() == id)
                     .findFirst()
                     .orElse(null);
 
-            Receptionist rec = db.getReceptionists()
+            Receptionist rec = hotelManagement.getReceptionists()
                     .stream()
                     .filter(r -> r.getId() == id)
                     .findFirst()
                     .orElse(null);
 
             if (worker != null) {
-                detailPanel.add(new JLabel("Full Name: " + worker.getFirstName() + " " + worker.getLastName()));
+                detailPanel.add(new JLabel("Full Name: " + worker.getName()));
                 detailPanel.add(new JLabel("Age: " + worker.getAge()));
                 detailPanel.add(new JLabel("Salary: $" + worker.getSalary()));
                 detailPanel.add(new JLabel("Job Title: " + worker.getJobTitle()));
@@ -125,7 +123,7 @@ public class ViewWorkersPanel extends JPanel {
             }
 
             if (rec != null) {
-                detailPanel.add(new JLabel("Full Name: " + rec.getFirstName() + " " + rec.getLastName()));
+                detailPanel.add(new JLabel("Full Name: " + rec.getName()));
                 detailPanel.add(new JLabel("Age: " + rec.getAge()));
                 detailPanel.add(new JLabel("Salary: $" + rec.getSalary()));
                 detailPanel.add(new JLabel("Job Title: Receptionist"));

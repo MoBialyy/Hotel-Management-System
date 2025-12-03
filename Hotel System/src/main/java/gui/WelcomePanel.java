@@ -13,10 +13,9 @@ public class WelcomePanel extends JPanel {
         // ---------------------------
         // Top Image (Hotel Banner)
         // ---------------------------
-        System.out.println(getClass().getResource("/assets/hotel_banner.jpg"));
+        //System.out.println(getClass().getResource("/assets/hotel_banner.jpg"));
         ImageIcon bannerIcon = new ImageIcon(
             getClass().getResource("/assets/hotel_banner.jpg")
-
         );
         Image scaledImg = bannerIcon.getImage().getScaledInstance(200, 100, Image.SCALE_SMOOTH);
         JLabel bannerLabel = new JLabel(new ImageIcon(scaledImg));

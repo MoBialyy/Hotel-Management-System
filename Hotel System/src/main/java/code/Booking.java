@@ -121,4 +121,18 @@ public class Booking {
             this.checkedOut = false;
         }
     }
+
+    public void updateRoomReference(Room newRoom) {
+        this.room = newRoom;  // Just update the reference, don't add booking
+    }
+
+    public void recalculateTotalPrice() {
+        this.totalPrice = calculateTotalPrice();
+    }
+
+    public void extendStay(int extraNights) {
+        this.nights += extraNights;
+        this.checkOutDate = checkInDate.plusDays(nights);
+        recalculateTotalPrice();
+    }
 }

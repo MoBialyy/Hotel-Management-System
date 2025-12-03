@@ -1,13 +1,17 @@
 package main.java.gui;
+import main.java.code.Booking;
+import main.java.code.HotelManagement;
+import main.java.code.Resident;
+import main.java.code.Room;
 
-import main.java.code.*;
 import javax.swing.*;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AddResidentToBookingPanel extends JPanel {
-    private HotelDB db = HotelDB.getInstance();
+
+    private HotelManagement hotelManagement = new HotelManagement();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
     private JComboBox<String> bookingCombo;
@@ -145,7 +149,7 @@ public class AddResidentToBookingPanel extends JPanel {
         bookingCombo.removeAllItems();
         bookingCombo.addItem("-- Select a Booking --");
         
-        List<Booking> bookings = db.getBookings();
+        List<Booking> bookings = hotelManagement.getBookings();
         for (Booking b : bookings) {
             if (!b.isCheckedOut()) {
                 Room room = b.getRoom();
@@ -174,7 +178,7 @@ public class AddResidentToBookingPanel extends JPanel {
         // Find selected booking
         int selectedIndex = bookingCombo.getSelectedIndex() - 1;
         int currentIndex = 0;
-        for (Booking b : db.getBookings()) {
+        for (Booking b : hotelManagement.getBookings()) {
             if (!b.isCheckedOut() && b.getRoom().getMaxResidents() > 1) {
                 if (currentIndex == selectedIndex) {
                     selectedBooking = b;
@@ -257,7 +261,7 @@ public class AddResidentToBookingPanel extends JPanel {
                 addressField.getText().trim(),
                 govIdField.getText().trim()
             );
-            db.addResident(newResident);
+            hotelManagement.addResident(newResident);
 
             // Create booking for the same room and dates
             Booking newBooking = new Booking(
@@ -267,7 +271,7 @@ public class AddResidentToBookingPanel extends JPanel {
                 selectedBooking.getNights(),
                 selectedBooking.getBoarding()
             );
-            db.addBooking(newBooking);
+            hotelManagement.addBooking(newBooking);
 
             JOptionPane.showMessageDialog(this, 
                 String.format("Resident %s added successfully to Room %d!\n" +

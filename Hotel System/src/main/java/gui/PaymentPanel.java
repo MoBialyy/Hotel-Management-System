@@ -1,14 +1,16 @@
 package main.java.gui;
-
-import main.java.code.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import main.java.code.Booking;
+import main.java.code.HotelManagement;
+import main.java.code.Resident;
+
 public class PaymentPanel extends JPanel {
-    private HotelDB db = HotelDB.getInstance();
+    
     private HotelManagement hotelMgmt = new HotelManagement();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     
@@ -93,7 +95,7 @@ public class PaymentPanel extends JPanel {
     private void loadGuests() {
         guestCombo.removeAllItems();
         guestCombo.addItem("-- Select a Guest --");
-        for (Resident r : db.getResidents()) {
+        for (Resident r : hotelMgmt.getResidents()) {
             if (!r.hasCheckedOut()) {
                 guestCombo.addItem(String.format("%s (ID: %d)", r.getName(), r.getId()));
             }
@@ -109,7 +111,7 @@ public class PaymentPanel extends JPanel {
         // Get the selected guest by finding them in the filtered list
         int selectedIndex = guestCombo.getSelectedIndex() - 1;
         int currentIndex = 0;
-        for (Resident r : db.getResidents()) {
+        for (Resident r : hotelMgmt.getResidents()) {
             if (!r.hasCheckedOut()) {
                 if (currentIndex == selectedIndex) {
                     selectedResident = r;
@@ -121,7 +123,7 @@ public class PaymentPanel extends JPanel {
         
         if (selectedResident == null) return;
         
-        List<Booking> bookings = selectedResident.getBookings();
+        List<Booking> bookings = hotelMgmt.getBookings(selectedResident);
 
         for (Booking b : bookings) {
             if (!b.isCheckedOut()) {

@@ -1,6 +1,4 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.Booking;
 import main.java.code.Resident;
 import main.java.code.Room;
@@ -14,7 +12,8 @@ import java.util.stream.Collectors;
 import main.java.code.HotelManagement;
 
 public class SearchBookingPanel extends JPanel {
-    private HotelDB db = HotelDB.getInstance();
+    
+    private HotelManagement hotelMgmt = new HotelManagement();
     private JTable bookingTable;
     private DefaultTableModel tableModel;
     private JTextField searchField;
@@ -154,7 +153,7 @@ public class SearchBookingPanel extends JPanel {
 
     private void loadAllBookings() {
         tableModel.setRowCount(0);
-        List<Booking> bookings = db.getBookings();
+        List<Booking> bookings = hotelMgmt.getBookings();
 
         if (bookings.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
@@ -178,7 +177,7 @@ public class SearchBookingPanel extends JPanel {
         String searchType = (String) searchTypeCombo.getSelectedItem();
         String statusFilter = (String) statusFilterCombo.getSelectedItem();
         
-        List<Booking> bookings = db.getBookings();
+        List<Booking> bookings = hotelMgmt.getBookings();
         
         // Filter by search criteria
         if (!searchText.isEmpty()) {
@@ -342,7 +341,7 @@ public class SearchBookingPanel extends JPanel {
             return;
         }
 
-        Resident resident = db.getResidentById(guestId);
+        Resident resident = hotelMgmt.getResidentById(guestId);
         if (resident == null) {
             JOptionPane.showMessageDialog(this, 
                 "Guest not found in the system.", 
@@ -357,7 +356,6 @@ public class SearchBookingPanel extends JPanel {
             JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            HotelManagement hotelMgmt = new HotelManagement();
             hotelMgmt.checkoutResident(resident);
             
             JOptionPane.showMessageDialog(this, 

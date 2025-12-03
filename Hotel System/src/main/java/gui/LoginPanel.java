@@ -1,17 +1,15 @@
 package main.java.gui;
-
-import main.java.code.HotelDB;
 import main.java.code.EmailSender;
 import main.java.code.Employee;
 import javax.mail.MessagingException;
-
-
+import main.java.code.HotelManagement;
 import javax.swing.*;
 import java.awt.*;
 
 public class LoginPanel extends JPanel {
 
-    private HotelDB hotelDB = HotelDB.getInstance();
+    //private HotelDB hotelDB = HotelDB.getInstance();
+    private HotelManagement hotelmg = new HotelManagement();
 
     public LoginPanel(JFrame frame) {
         setLayout(new BorderLayout());
@@ -135,7 +133,7 @@ public class LoginPanel extends JPanel {
             }
 
             // Check if employee exists
-            Employee emp = hotelDB.findEmployeeByEmail(email);
+            Employee emp = hotelmg.findEmployeeByEmail(email);
             if (emp == null) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -150,7 +148,7 @@ public class LoginPanel extends JPanel {
             String code = String.valueOf((int)(Math.random() * 900000) + 100000);
 
             try {
-                // Send code via Gmail
+                // Send code
                 EmailSender.sendCode(email, code);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
@@ -170,8 +168,10 @@ public class LoginPanel extends JPanel {
                     JOptionPane.QUESTION_MESSAGE
             );
 
+            // User canceled
             if (userCode == null) return;
 
+            // Check code
             if (!userCode.equals(code)) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -192,7 +192,8 @@ public class LoginPanel extends JPanel {
 
             if (newPass == null || newPass.isBlank()) return;
 
-            emp.setPassword(newPass);
+            // Update password
+            hotelmg.setEmployeeNewPassword(emp, newPass);
             JOptionPane.showMessageDialog(
                     this,
                     "Password reset successfully.",
@@ -202,7 +203,6 @@ public class LoginPanel extends JPanel {
         });
 
 
-
         // ---------------------------
         // Login Action
         // ---------------------------
@@ -210,7 +210,7 @@ public class LoginPanel extends JPanel {
             String email = usernameField.getText().trim();
             String password = new String(passwordField.getPassword()).trim();
 
-            Employee emp = hotelDB.findEmployeeByEmail(email);
+            Employee emp = hotelmg.findEmployeeByEmail(email);
 
             // Hardcoded admin credentials
             if (email.equalsIgnoreCase("admin@hotel.com") && password.equals("admin123")) {
